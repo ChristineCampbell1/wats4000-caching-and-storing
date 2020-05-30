@@ -38,45 +38,48 @@ export default {
   data () {
     return {
       weatherData: null,
-      messages: [],
       query: '',
       showLoading: false,
+      messages: []
     }
   },
   created () {
     this.showLoading = true;
 
-    // TODO: Cache these API results using the City ID as the label
+    let cacheLabel = 'forecast_' + this.$route.params.cityId;
 
-    // TODO: Create a cacheLabel value
+    let cacheExpiry = 15 * 60 * 1000;
 
-    // TODO: Create a cacheExpiry value set to 15 minutes in milliseconds
-
-    // TODO: Use a conditional to check if the API query has been cached
-    // If so, use that cached data
-    // If not, make the API call and cache the data with the cacheLabel and cacheExpiry defined above
-
-    API.get('forecast', {
-      params: {
-          id: this.$route.params.cityId
-      }
-    })
-    .then(response => {
+    if (this.$ls.get(cacheLabel)) {
+      console.log('Cached value detected.');
+      this.weatherData = this.$ls.get(cacheLabel);
       this.showLoading = false;
-      this.weatherData = response.data;
-    })
-    .catch(error => {
-      this.showLoading = false;
-      this.messages.push({
-        type: 'error',
-        text: error.message
+    } else {
+      console.log('No cache detected. Making API request.');
+      API.get('forecast', {
+        params: {
+            id: this.$route.params.cityId
+        }
+      })
+      .then(response => {
+        this.$ls.set(cacheLabel, response.data, cacheExpiry);
+        this.showLoading = false;
+        this.weatherData = response.data;
+      })
+      .catch(error => {
+        this.showLoading = false;
+        this.messages.push({
+          type: 'error',
+          text: error.message
+        });
       });
-    });
+    }
   },
   filters: {
     formatDate: function (timestamp){
       let date = new Date(timestamp * 1000);
       const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      //let weekday = date.getDay();
       let daynum = date.getDate();
       let month = date.getMonth();
 
@@ -125,5 +128,3 @@ a {
   color: #42b983;
 }
 </style>
-
-

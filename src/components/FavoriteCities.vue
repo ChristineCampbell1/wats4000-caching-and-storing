@@ -2,7 +2,7 @@
     <ul class="favorite-cities">
         <li><h2>Favorite Cities</h2></li>
         <li v-if="favoriteCities.length < 1">No favorites cities to display.</li>
-        <li v-for="(city,index) in favoriteCities" :key="index">
+        <li v-for="city in favoriteCities" :key="city">
           <router-link v-bind:to="{ name: 'CurrentWeather', params: { cityId: city.id } }">{{ city.name }}</router-link> <button v-on:click="removeCity(city)" class="remove">x</button>
         </li>
     </ul>
@@ -19,10 +19,8 @@ export default {
   },
   methods: {
     removeCity: function (city) {
-      // TODO: Add logic to remove a city from the `favoriteCities` array.
-      // Hint: Use `indexOf(city)` on the `this.favoriteCities` array and then use the `splice()` method
-
-      // TODO: Save the new favoriteCities array to the cache.
+      this.favoriteCities.splice(this.favoriteCities.indexOf(city), 1);
+      this.$ls.set('favoriteCities', this.favoriteCities);
     }
   }
 }
