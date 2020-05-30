@@ -67,11 +67,9 @@ export default {
       let cacheExpiry = 15 * 60 * 1000;
 
       if (this.$ls.get(cacheLabel)){
-        console.log('Cached query detected.');
         this.results = this.$ls.get(cacheLabel);
         this.showLoading = false;
       } else {
-        console.log('No cache available. Making API request.');
         API.get('find', {
           params: {
               q: this.query
@@ -79,7 +77,6 @@ export default {
         })
         .then(response => {
           this.$ls.set(cacheLabel, response.data, cacheExpiry);
-          console.log('New query has been cached as: ' + cacheLabel);
           this.results = response.data;
           this.showLoading = false;
         })
